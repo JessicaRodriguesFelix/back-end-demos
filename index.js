@@ -8,6 +8,25 @@ const { Op } = require('sequelize');
 app.use(express.json());
 app.use(express.urlencoded({extended:true}));
 
+
+app.get('/dogs', async (req, res, next)=> {
+  try {
+    const where = {}
+    const queriesArray = ["name", "description", "breed", "color"];
+    for (const key of queriesArray) {
+      if (req.query[key]){
+        where[key]={
+          [Op.like]: `%${req.query[key]}%`
+        }
+      }
+    }
+      const dogs = await Dog.findAll({where})
+      res.send(dogs);
+ } catch (error) {
+  next(error)
+ }
+})
+
 app.post('/dogs', async (req, res, next) => {
   try {
     const {name, breed, color, description} = req.body;
